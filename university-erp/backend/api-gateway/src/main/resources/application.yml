@@ -1,0 +1,160 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # Auth Service Routes
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=2
+
+        # User Service Routes
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        # Department Service Routes
+        - id: agriculture-service
+          uri: lb://agriculture-service
+          predicates:
+            - Path=/api/agriculture/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: physiotherapy-service
+          uri: lb://physiotherapy-service
+          predicates:
+            - Path=/api/physiotherapy/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: bmrit-service
+          uri: lb://bmrit-service
+          predicates:
+            - Path=/api/bmrit/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: btp-service
+          uri: lb://btp-service
+          predicates:
+            - Path=/api/btp/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: mlp-service
+          uri: lb://mlp-service
+          predicates:
+            - Path=/api/mlp/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: bca-service
+          uri: lb://bca-service
+          predicates:
+            - Path=/api/bca/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: bba-service
+          uri: lb://bba-service
+          predicates:
+            - Path=/api/bba/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        # Common Service Routes
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: report-service
+          uri: lb://report-service
+          predicates:
+            - Path=/api/reports/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+        - id: file-service
+          uri: lb://file-service
+          predicates:
+            - Path=/api/files/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: 
+              - "http://localhost:3000"
+              - "http://localhost:8000"
+              - "http://127.0.0.1:3000"
+              - "http://127.0.0.1:8000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:admin123@localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+
+jwt:
+  secret: "university-erp-secret-key-2024-spring-boot-microservices-jwt-token-authentication"
+  expiration: 86400000 # 24 hours
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.university.erp.gateway: DEBUG
